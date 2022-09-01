@@ -1,0 +1,11 @@
+2000  	% sampling points
+500  	% size for window for gragh  
+0.5e-6	% time per point
+19.05e-3	% diametar of bars
+1.9e+11	% bars' Young's modulus
+0.995	% distance between incident strain gage and specimen
+0.520	% distance between transmitted strain gage and specimen
+4800	% elastic wave velocity of the bars
+2.12	% gage factor of strain gages
+10.18	% bridge tension
+1		% 1 for compression

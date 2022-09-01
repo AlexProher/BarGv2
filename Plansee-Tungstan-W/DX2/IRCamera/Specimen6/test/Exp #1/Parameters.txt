@@ -1,0 +1,13 @@
+Specimen Diameter: 0.007 [m]
+Specimen Length: 0.007 [m]
+Bar Diameter: 0.019 [m]
+Young's Modulus: 1900.0 [GPa]
+First Gauge: 0.955 [m]
+Second Gauge: 0.52 [m]
+Sound Velocity: 4800.0 [m/s]
+Gauge Factor: 2.12
+Bridge Tension: 10.18 [V]
+Spacing: 60 Points
+Prominence: 50.0%
+Curve Smoothing Parameter: 7100
+Average Strain Rate: 1324.9134882023766[1/s]

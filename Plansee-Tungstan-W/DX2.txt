@@ -1,0 +1,7 @@
+name	d	l
+experiment_1	7.08	7.15
+experiment_2	7.07	7.08
+experiment_3	7.08	7.20
+experiment_4	7.07	7.26
+experiment_5	7.08	7.23
+experiment_6	7.07	7.04
