@@ -28,6 +28,7 @@ def cut_signal(signal1, signal2, time1, time2):
     #сначала интерполируем второй синал чтобы его можно было двигать плавно
     interpolated_signal2 = my_interpolation(signal2, 500)   #500 нс - величина обратная Частоте дискретизации
     p1, p2 = find_slope(signal1, interpolated_signal2)
+    return interpolated_signal2
 
     
 
