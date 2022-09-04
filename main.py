@@ -51,7 +51,7 @@ for material in materials:
 
         #Делаем анализ
         ca = CA.CoreAnalyzer(way_to_item, np_param)
-        row_data = ca.load_signals(sample)
+        raw_data = ca.load_signals(sample)
         ca.analyze()
 
         #формируем итоговую таблицу
