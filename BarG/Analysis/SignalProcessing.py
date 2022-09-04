@@ -76,12 +76,12 @@ def auto_crop(update_logger, CA):
 
     update_logger("\n...Peaks detected in both signals. ")
     #   The mode changes sign in some calculation, so a constant of 1 or -1 will be useful.
-    #if CA.mode == "compression":
-    #    K = 1
+    if CA.mode == "compression":
+        K = 1
 
-    #else:
-    #    K = -1
-    K = 1
+    else:
+        K = -1
+    
     #   The following will look for the point where the wave changes its sign from both sides,
     #   Obtaining these points is crucial for determining where to crop the signal to export the different waves.
 

@@ -1,4 +1,5 @@
 from numpy import transpose, savetxt, array
+import pandas as pd
 import numpy as np
 import sys
 import os
@@ -9,6 +10,7 @@ from BarG.Calculators import FinalCalculation
 from BarG.Calculators.dispersion_correction import dispersion_correction
 from BarG.Analysis import SignalProcessing
 
+import BarG.Analysis._read_files as rd
 from BarG.Utilities.TwoDimVec import TwoDimVec
 
 
@@ -54,6 +56,38 @@ class CoreAnalyzer:
         self.damp_f = 10 ** (-3)
         self.bridge_type = 0.25
         self.mode = 'compression'
+        self.ir_mode = False
+
+    def load_signals(self, files):
+        
+        files = os.listdir(self.path_folder)
+        #Загружаем сигналы эксперимента
+        data_FLT = [item for item in files if '.FLT' in item]
+        data_WFT = [item for item in files if '.WFT' in item]
+
+        if data_FLT:
+            signal1 = rd.read_flt(self.path_folder +data_FLT[0])
+            signal2 = rd.read_flt(self.path_folder +data_FLT[1])
+        elif data_WFT:
+            hdr, signal1 = rd.read_wft(self.path_folder +data_WFT[0])
+            hdr, signal2 = rd.read_wft(self.path_folder +data_WFT[1])
+
+
+        #Определяем кто из них какой
+        if max(signal1.vol) > max(signal2.vol):
+            incid = signal1.vol-signal1.vol[0]
+            transm = signal2.vol-signal2.vol[0]
+        else:
+            incid = signal2.vol-signal2.vol[0]
+            transm = signal1.vol-signal1.vol[0]
+        time = signal1.sec
+
+        data = pd.DataFrame({'time': time,
+                            'incid': incid,
+                            'trans': transm})
+
+        self.load_experiments(np.array(incid), np.array(transm), np.array(time))
+        return data
         
 
 
