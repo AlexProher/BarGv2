@@ -10,7 +10,8 @@ import _read_files as rd
 
 way = '/Users/lubimyj/Git/experiments/Plansee-Tungstan-W/'
 
-materials = ['Denal920','DX2']
+materials = os.listdir(way)
+materials = [item for item in materials if ('result' not in item) and ('.' not in item)]
 
 
 
@@ -92,7 +93,7 @@ for material in materials:
                                     'F_in': ca.F_in,
                                     'F_out': ca.F_out })
         
-        way_to_result = way + "/" + 'result' + material + "/" + sample + "/" 
+        way_to_result = way + "/" + 'results_' + material + "/" + sample + "/" 
         if not os.path.exists(way_to_result):
             os.makedirs(way_to_result)
 
