@@ -1,59 +1,63 @@
 import numpy as np
 import pandas as pd
 
-
-
 import os
-import sys
-from BarG.Analysis import CoreAnalyzer as CA
 
-def sep_meas(words):
-    signs = '1234567890.'
-    res = ''
-    for item in words:
-        if item in signs:
-            res+=item
-    return float(res)
-    
-def read_signal(way):
-    file = open(way)
-    file.readlines(13)
-    res = pd.read_csv(file, header = None, sep = '\t', names = ['vol', 'sec'])
-    file.close()
-    return res
+from BarG.Analysis import CoreAnalyzer as CA
+import _read_files as rd
+
 
 
 way = '/Users/lubimyj/Git/experiments/Plansee-Tungstan-W/'
+
 materials = ['Denal920','DX2']
-specimen = ['1/','2/','3/','4/','5/','6/']
-subFold = '/IRCamera/Specimen'
-testFold = 'test/EXP #1/'
-dataFold = '/FLT/'
-files = ['Parameters.txt','incid.FLT','trans.FLT']
-#sr = 2e+9
+
+
+
 for material in materials:
     print (f'material {material}')
-    for item in range(len(specimen)):
-        print (f'specimen number {specimen[item][0]}')
+    way_to_material = way + material + '/'
+    print(way_to_material)
+
+    files = os.listdir(way_to_material)
+    files = [item for item in files if item[0] != '.'] ## на случей если в папке есть служебные файлы начинающиеся с "."
+
+    dim = [item for item in files if '.txt' in item][0]
+    samples = [item for item in files if '.txt' not in item]
+
+    #Загружаем геометрические параметры образцов 
+    shapes = pd.read_csv(way_to_material + dim, sep = '\t')
+    for sample in samples:
+
+        print (f'specimen {sample}')
+        way_to_item = way_to_material + sample + '/'
+        print(way_to_item)
+
+        files_on_item = os.listdir(way_to_item)
+        files_on_item = [item for item in files_on_item if item[0] != '.'] ## на случей если в папке есть служебные файлы начинающиеся с "."
+
+        parameters = [item for item in files_on_item if '.txt' in item][0]
         
-        #Загружаем геометрические параметры образцов 
-        shapes = pd.read_csv(way+material+'.txt', sep = '\t')
+        
+        #Загружаем файл параметров для обработки экспериментов
 
-        #Конфигурируем файл параметров для обработки экспериментов
-        param = pd.read_csv(way + material + subFold + specimen[item] + testFold + files[0],
-                            header = None, names = ['title', 'value'], sep=':')
+        param = pd.read_csv(way_to_item + parameters,
+                            header = None, sep='\t')
 
-        param['value'] = param['value'].apply(sep_meas)
-        param.iloc[0,1] = float(shapes.d[item])*1e-3
-        param.iloc[1,1] = float(shapes.l[item])*1e-3
-        param.iloc[3,1] = param.value[3]*100000000 #1.9e+11
-        np_param = np.array(param.value)
+        ind = samples.index(sample)
+        np_param = np.array([shapes.d[ind]*1e-3, shapes.l[ind]*1e-3, *param.iloc[:,1]])
 
-        path = way + material + subFold + specimen[item] + testFold + dataFold
 
         #Загружаем сигналы эксперимента
-        signal1 = read_signal(path +files[1])
-        signal2 = read_signal(path +files[2])
+        data_FLT = [item for item in files_on_item if '.FLT' in item]
+        data_WFT = [item for item in files_on_item if '.WFT' in item]
+
+        if data_FLT:
+            signal1 = rd.read_flt(way_to_item +data_FLT[0])
+            signal2 = rd.read_flt(way_to_item +data_FLT[1])
+        elif data_WFT:
+            hdr, signal1 = rd.read_wft(way_to_item +data_WFT[0])
+            hdr, signal2 = rd.read_wft(way_to_item +data_WFT[1])
 
 
         #Определяем кто из них какой
@@ -70,7 +74,7 @@ for material in materials:
                             'trans': transm})
 
         #Делаем анализ
-        ca = CA.CoreAnalyzer(path, np_param)
+        ca = CA.CoreAnalyzer(way_to_item, np_param)
         ca.load_experiments(np.array(incid), np.array(transm), np.array(time))
         ca.analyze()
 
@@ -87,7 +91,10 @@ for material in materials:
                                     'true_stress': ca.true_stress_strain[1],
                                     'F_in': ca.F_in,
                                     'F_out': ca.F_out })
-        way_to_file = way + material + subFold + specimen[item]
+        
+        way_to_result = way + "/" + 'result' + material + "/" + sample + "/" 
+        if not os.path.exists(way_to_result):
+            os.makedirs(way_to_result)
 
-        final_table.to_csv(way_to_file + 'result_data.txt', index = False, sep = '\t')
+        final_table.to_csv(way_to_result + 'result_data.txt', index = False, sep = '\t')
                             
