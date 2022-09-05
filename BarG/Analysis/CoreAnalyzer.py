@@ -13,6 +13,69 @@ from BarG.Analysis import SignalProcessing
 import BarG.Analysis._read_files as rd
 from BarG.Utilities.TwoDimVec import TwoDimVec
 
+class Experiment:
+    def __init__(self, materials = None):
+        if materials:
+            self.materaials = materials
+            self.list_materaials = [material.title for material in materials]
+        else:
+            self.materaials = []
+            self.list_materaials = []
+
+    def add_material(self, material):
+        if not isinstance(material, Material):
+            return False
+        self.materals.append(material)
+        self.list_materaials.append(material.title)
+
+class Material:
+    def __init__(self, material):
+        self.title = material
+        self.__list_specimens = []
+        self.__specimens = []
+        self.__specimen_counter = -1
+
+    def add_specimen(self, specimen):
+
+        if isinstance (specimen, list):
+            for item in specimen:
+                self.add_specimen(item)
+        else:
+            if not isinstance(specimen, Specimen):
+                return False
+            self.__specimen_counter +=1
+            self.__specimens.append(specimen)
+            self.__list_specimens.append(specimen.title)
+            specimen.index = self.__specimen_counter
+        
+    def get_specimens(self):
+        return self.__specimens
+
+    def get_list_specimens(self):
+        return self.__list_specimens
+class Specimen:
+    
+    def __init__(self, specimen):
+        self.title = specimen
+        self.index = None
+
+        self.l = None
+        self.d = None
+
+        self.valid = True
+        self.time = None
+        self.incid = None
+        self.trans = None
+        self.refle = None
+        self.u_in = None
+        self.u_out = None
+        self.eng_strain = None
+        self.eng_stress = None
+        self.F_in = None
+        self.F_out = None
+        self.true_strain = None
+        self.true_strain = None
+
 
 class CoreAnalyzer:
 
@@ -21,6 +84,7 @@ class CoreAnalyzer:
         self.log = ''
 
         self.path_folder = path
+        self.result_path = None
         self.parameters = parameters
 
         self.incid = TwoDimVec()
@@ -170,76 +234,50 @@ class CoreAnalyzer:
             return True
         else:
             return False
+
+            
     def update_logger(self, text):
         self.log += text
         print (text)
     
-    def save_data(CA, exp_num, parameters):
+    def save_data(self):
         
 
-        desired_path = CA.path_folder + "/Exp #" + str(exp_num)
+        desired_path = self.result_path
 
-        
-        
-        vectors = [CA.incid_og.y, CA.trans_og.y, CA.incid_og.x]
+        vectors = [self.incid_og.y, self.trans_og.y, self.incid_og.x]
         df = transpose(array(vectors))
         filepath = desired_path + '/Raw Signals.csv'
         savetxt(filepath, df, delimiter=',', header='Incident [V], Transmitted [V], time [s]', fmt='%s')
 
-        vectors = [CA.corr_incid.y, CA.corr_refle.y, CA.corr_trans.y, CA.time]
+        vectors = [self.corr_incid.y, self.corr_refle.y, self.corr_trans.y, self.time]
         df = transpose(array(vectors))
         filepath = desired_path + '/Corrected Signals.csv'
         savetxt(filepath, df, delimiter=',', header='Incident [V], Reflected [V], Transmitted [V], time [s]', fmt='%s')
 
-        vectors = [CA.u_in, CA.u_out, CA.time]
+        vectors = [self.u_in, self.u_out, self.time]
         df = transpose(array(vectors))
         filepath = desired_path + '/Displacements.csv'
         savetxt(filepath, df, delimiter=',', header='u_in [m], u_out [m], time [s]', fmt='%s')
 
-        vectors = [CA.true_stress_strain[0], CA.true_stress_strain[1]]
+        vectors = [self.true_stress_strain[0], self.true_stress_strain[1]]
         df = transpose(array(vectors))
         filepath = desired_path + '/Stress-Strain True.csv'
         savetxt(filepath, df, delimiter=',', header='Strain, Stress', fmt='%s')
 
-        vectors = [CA.eng_stress_strain[0], CA.eng_stress_strain[1]]
+        vectors = [self.eng_stress_strain[0], self.eng_stress_strain[1]]
         df = transpose(array(vectors))
         filepath = desired_path + '/Stress-Strain Engineering.csv'
         savetxt(filepath, df, delimiter=',', header='Strain, Stress', fmt='%s')
 
-        vectors = [CA.F_in, CA.F_out, CA.time]
+        vectors = [self.F_in, self.F_out, self.time]
         df = transpose(array(vectors))
         filepath = desired_path + '/Forces.csv'
         savetxt(filepath, df, delimiter=',', header='F_in [N], F_out [N], time [s]', fmt='%s')
 
-        vectors = [CA.v_in, CA.v_out, CA.time]
+        vectors = [self.v_in, self.v_out, self.time]
         df = transpose(array(vectors))
         filepath = desired_path + '/Velocities.csv'
         savetxt(filepath, df, delimiter=',', header='v_in [m/s], v_out [m/s], time [s]', fmt='%s')
 
 
-        f_path = desired_path + "/Parameters.txt"
-
-        if os.path.isfile(f_path):
-            os.remove(f_path)
-
-        f = open(f_path, 'x')
-        f = open(f_path, 'r+')
-        f.truncate(0)
-        s = ""
-
-        s += str(parameters[0][0]) + ": " + str(parameters[0][1]) + " [m]" + "\n"
-        s += str(parameters[1][0]) + ": " + str(parameters[1][1]) + " [m]" + "\n"
-        s += str(parameters[2][0]) + ": " + str(parameters[2][1]) + " [m]" + "\n"
-        s += str(parameters[3][0]) + ": " + str(parameters[3][1] / (10 ** 9)) + " [GPa]" + "\n"
-        s += str(parameters[4][0]) + ": " + str(parameters[4][1]) + " [m]" + "\n"
-        s += str(parameters[5][0]) + ": " + str(parameters[5][1]) + " [m]" + "\n"
-        s += str(parameters[6][0]) + ": " + str(parameters[6][1]) + " [m/s]" + "\n"
-        s += str(parameters[7][0]) + ": " + str(parameters[7][1]) + "\n"
-        s += str(parameters[8][0]) + ": " + str(parameters[8][1]) + " [V]" + "\n"
-        s += "Spacing: " + str(CA.spacing) + " Points" + "\n"
-        s += "Prominence: " + str(CA.prominence_percent * 100) + "%" + "\n"
-        s += "Curve Smoothing Parameter: " + str(CA.smooth_value * 100) + "\n"
-        s += "Average Strain Rate: " + str(CA.mean_strain_rate) + "[1/s]"
-        s += "\n"  # For some reason, there is a problem without a new line at the end of the defaults file.
-        f.write(s)
-        f.close()
