@@ -30,14 +30,19 @@ for material in exp.materaials:
     material.add_specimen([Specimen(item) for item in files if '.txt' not in item])
 
     #Загружаем геометрические параметры образцов 
-    shapes = pd.read_csv(way_to_material + dim, sep = '\t')
+    if dim:
+        shapes = pd.read_csv(way_to_material + dim, sep = '\t')
+    else:
+        print('NO mechanical experiment to analyse')
+
     for specimen in material.get_specimens():
 
+        if shapes.d[specimen.index] and shapes.l[specimen.index]:
+            specimen.d = shapes.d[specimen.index]*1e-3
+            specimen.l = shapes.l[specimen.index]*1e-3
+            specimen.mech = True
         
-        specimen.d = shapes.d[specimen.index]*1e-3
-        specimen.l = shapes.l[specimen.index]*1e-3
-
-
+        
         print (f'specimen {specimen.title}')
         way_to_item = way_to_material + specimen.title + '/'
 
@@ -48,23 +53,26 @@ for material in exp.materaials:
         for item in files_on_item:
             if 'Parameters.txt' in item:
                 parameters = item
+                                #Загружаем файл параметров для обработки экспериментов
+                param = pd.read_csv(way_to_item + parameters,
+                                    header = None, sep='\t')
+                
+
+                np_param = np.array([specimen.d, 
+                                    specimen.l, 
+                                    *param.iloc[:,1]])
+                                    
+            #Need to think about it                        
+            #else:
+            #    specimen.mech = False
+            #    np_param = np.zeros((13,1))
+
             if '_IR' in item:
                 specimen.IR = True
-        
-        #Загружаем файл параметров для обработки экспериментов
-        param = pd.read_csv(way_to_item + parameters,
-                            header = None, sep='\t')
-        
-
-        np_param = np.array([specimen.d, 
-                            specimen.l, 
-                            *param.iloc[:,1]])
-
 
         #Делаем анализ
         ca = CoreAnalyzer(way_to_item, np_param, specimen)
-        ca.load_signals(specimen.title)
-        ca.analyze()
+        ca.begin_analyse(specimen.title)
 
         specimen.time = ca.time
         specimen.incid = ca.corr_incid.y

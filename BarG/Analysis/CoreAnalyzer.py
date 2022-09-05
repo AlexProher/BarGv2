@@ -64,6 +64,9 @@ class Specimen:
 
         self.valid = True
         self.IR = None
+        self.mech = True
+
+
         self.time = None
         self.incid = None
         self.trans = None
@@ -126,34 +129,43 @@ class CoreAnalyzer:
         self.mode = 'compression'
 
         self.ir_mode = specimen.IR
+        self.mech_exp = specimen.mech
         self.temperature = None
         self.time_IR = None
 
-    def load_signals(self, files):
-        
-        files = os.listdir(self.path_folder)
-        #Загружаем сигналы эксперимента
-        data_FLT = [item for item in files if '.FLT' in item]
-        data_WFT = [item for item in files if '.WFT' in item]
+    def begin_analyse(self, files):
+        if self.mech_exp:
 
-        if data_FLT:
-            signal1 = rd.read_flt(self.path_folder +data_FLT[0])
-            signal2 = rd.read_flt(self.path_folder +data_FLT[1])
-        elif data_WFT:
-            hdr, signal1 = rd.read_wft(self.path_folder +data_WFT[0])
-            hdr, signal2 = rd.read_wft(self.path_folder +data_WFT[1])
+            files = os.listdir(self.path_folder)
+            #Загружаем сигналы эксперимента
+            data_FLT = [item for item in files if '.FLT' in item]
+            data_WFT = [item for item in files if '.WFT' in item]
 
+            if data_FLT:
+                signal1 = rd.read_flt(self.path_folder +data_FLT[0])
+                signal2 = rd.read_flt(self.path_folder +data_FLT[1])
+            elif data_WFT:
+                hdr, signal1 = rd.read_wft(self.path_folder +data_WFT[0])
+                hdr, signal2 = rd.read_wft(self.path_folder +data_WFT[1])
+            else:
+                self.update_logger('No mech data to analyse')
+                self.mech_exp = False
 
-        #Определяем кто из них какой
-        if max(signal1.vol) > max(signal2.vol):
-            incid = signal1.vol-signal1.vol[0]
-            transm = signal2.vol-signal2.vol[0]
+            #Определяем кто из них какой
+        if self.mech_exp:
+            if max(signal1.vol) > max(signal2.vol):
+                incid = signal1.vol-signal1.vol[0]
+                transm = signal2.vol-signal2.vol[0]
+            else:
+                incid = signal2.vol-signal2.vol[0]
+                transm = signal1.vol-signal1.vol[0]
+            time = signal1.sec
+            self.load_experiments(np.array(incid), np.array(transm), np.array(time))
+
+        if self.ir_mode:
+            IR_calculation(self)
         else:
-            incid = signal2.vol-signal2.vol[0]
-            transm = signal1.vol-signal1.vol[0]
-        time = signal1.sec
-
-        self.load_experiments(np.array(incid), np.array(transm), np.array(time))
+            self.update_logger('No IR data to analyse')
 
         return True
         
@@ -180,7 +192,7 @@ class CoreAnalyzer:
         self.incid_og = self.incid_og.create_absolute_copy(self.incid)
         self.trans_og = self.trans_og.create_absolute_copy(self.trans)
 
-        return True
+        return self.analyze()
 
     def analyze(self):
         """
@@ -201,9 +213,7 @@ class CoreAnalyzer:
 
         self.single_analysis()
 
-        if self.current_specimen.IR:
-            
-            IR_calculation(self)
+
 
         return True 
 
