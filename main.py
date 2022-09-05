@@ -45,7 +45,11 @@ for material in exp.materaials:
         files_on_item = os.listdir(way_to_item)
         files_on_item = [item for item in files_on_item if item[0] != '.'] ## на случей если в папке есть служебные файлы начинающиеся с "."
 
-        parameters = [item for item in files_on_item if '.txt' in item][0]
+        for item in files_on_item:
+            if 'Parameters.txt' in item:
+                parameters = item
+            if '_IR' in item:
+                specimen.IR = True
         
         #Загружаем файл параметров для обработки экспериментов
         param = pd.read_csv(way_to_item + parameters,
@@ -58,8 +62,8 @@ for material in exp.materaials:
 
 
         #Делаем анализ
-        ca = CoreAnalyzer(way_to_item, np_param)
-        raw_data = ca.load_signals(specimen.title)
+        ca = CoreAnalyzer(way_to_item, np_param, specimen)
+        ca.load_signals(specimen.title)
         ca.analyze()
 
         specimen.time = ca.time
@@ -76,6 +80,9 @@ for material in exp.materaials:
         specimen.true_strain = ca.true_stress_strain[0]
         specimen.true_stress = ca.true_stress_strain[1]
 
+        specimen.temperature = ca.temperature
+        specimen.time_IR = ca.time_IR
+
 
 
         #формируем итоговую таблицу
@@ -90,7 +97,8 @@ for material in exp.materaials:
                                     'true_strain': specimen.true_strain,
                                     'true_stress': specimen.true_stress,
                                     'F_in': specimen.F_in,
-                                    'F_out': specimen.F_out })
+                                    'F_out': specimen.F_out,
+                                    })
         
         way_to_result = way + "/" + 'results_' + material.title + "/" + specimen.title + "/" 
         

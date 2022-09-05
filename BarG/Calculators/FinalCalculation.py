@@ -3,7 +3,6 @@ from scipy.integrate import trapz, cumtrapz
 
 from BarG.Analysis import SignalProcessing
 from BarG.Calculators import BetaInt
-from BarG.Calculators.IR_calibration import IR_calibration
 from BarG.Utilities.TwoDimVec import TwoDimVec
 
 

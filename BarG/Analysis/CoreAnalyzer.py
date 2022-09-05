@@ -1,12 +1,11 @@
 from numpy import transpose, savetxt, array
-import pandas as pd
 import numpy as np
-import sys
 import os
 
 from scipy.integrate import trapz, cumtrapz
 
-from BarG.Calculators import FinalCalculation
+from BarG.Calculators import FinalCalculation 
+from BarG.Calculators.IR_calculation import IR_calculation
 from BarG.Calculators.dispersion_correction import dispersion_correction
 from BarG.Analysis import SignalProcessing
 
@@ -46,6 +45,7 @@ class Material:
             self.__specimen_counter +=1
             self.__specimens.append(specimen)
             self.__list_specimens.append(specimen.title)
+            specimen.material = self.title
             specimen.index = self.__specimen_counter
         
     def get_specimens(self):
@@ -63,6 +63,7 @@ class Specimen:
         self.d = None
 
         self.valid = True
+        self.IR = None
         self.time = None
         self.incid = None
         self.trans = None
@@ -76,13 +77,16 @@ class Specimen:
         self.true_strain = None
         self.true_strain = None
 
+        self.temperature = None
+        self.time_IR = None
+
 
 class CoreAnalyzer:
 
-    def __init__(self, path,  parameters):
+    def __init__(self, path,  parameters, specimen):
 
         self.log = ''
-
+        self.current_specimen = specimen
         self.path_folder = path
         self.result_path = None
         self.parameters = parameters
@@ -120,7 +124,10 @@ class CoreAnalyzer:
         self.damp_f = 10 ** (-3)
         self.bridge_type = 0.25
         self.mode = 'compression'
-        self.ir_mode = False
+
+        self.ir_mode = specimen.IR
+        self.temperature = None
+        self.time_IR = None
 
     def load_signals(self, files):
         
@@ -146,12 +153,9 @@ class CoreAnalyzer:
             transm = signal1.vol-signal1.vol[0]
         time = signal1.sec
 
-        data = pd.DataFrame({'time': time,
-                            'incid': incid,
-                            'trans': transm})
-
         self.load_experiments(np.array(incid), np.array(transm), np.array(time))
-        return data
+
+        return True
         
 
 
@@ -164,10 +168,7 @@ class CoreAnalyzer:
             It keeps an "og" version - an original version of the vectors
              to be untouched by any processing that follows.
         """
-        #self.incid = TwoDimVec([incid[i][1] for i in range(len(incid))],
-        #                       [incid[i][0] for i in range(len(incid))]).force_signal_to_start_at_zero()
-        #self.trans = TwoDimVec([trans[i][1] for i in range(len(trans))],
-        #                       [trans[i][0] for i in range(len(trans))]).force_signal_to_start_at_zero()
+
         self.incid = TwoDimVec(time,incid).force_signal_to_start_at_zero()
         self.trans = TwoDimVec(time,trans).force_signal_to_start_at_zero()
 
@@ -197,7 +198,14 @@ class CoreAnalyzer:
         self.trans = self.trans.create_absolute_copy(trans)
         self.refle = self.refle.create_absolute_copy(refle)
 
-        return self.single_analysis()
+
+        self.single_analysis()
+
+        if self.current_specimen.IR:
+            
+            IR_calculation(self)
+
+        return True 
 
     def single_analysis(self):
 
@@ -213,29 +221,9 @@ class CoreAnalyzer:
         self.corr_trans.y = corr_transmitted
         self.corr_refle.y = corr_reflected
 
-        valid = FinalCalculation.final_calculation(self.update_logger, self)
+        return FinalCalculation.final_calculation(self.update_logger, self)
 
-        if valid:
- 
-            #self.save_data(self, self.exp_num, self.parameters)
-
-            return True
-
-        return False
-
-    def analyze_all(self):
-        self.corr_incid.y, self.corr_trans.y, self.corr_refle.y = dispersion_correction(self.update_logger, self)
-        self.corr_incid.x = self.incid.x.copy()
-        self.corr_trans.x = self.trans.x.copy()
-        self.corr_refle.x = self.refle.x.copy()
-
-        valid = FinalCalculation.final_calculation(self)
-        if valid:
-            return True
-        else:
-            return False
-
-            
+   
     def update_logger(self, text):
         self.log += text
         print (text)
@@ -279,5 +267,11 @@ class CoreAnalyzer:
         df = transpose(array(vectors))
         filepath = desired_path + '/Velocities.csv'
         savetxt(filepath, df, delimiter=',', header='v_in [m/s], v_out [m/s], time [s]', fmt='%s')
+
+        if (self.ir_mode):
+            vectors = [self.time_IR, self.temperature]
+            df = transpose(array(vectors))
+            filepath = desired_path + '/Temperature.csv'
+            savetxt(filepath, df, delimiter=',', header='time [s], temperature [C]', fmt='%s')
 
 
