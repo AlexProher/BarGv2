@@ -5,7 +5,7 @@ import os
 
 from BarG.Analysis.CoreAnalyzer import CoreAnalyzer
 from BarG.Analysis.CoreAnalyzer import Material, Experiment, Specimen
-from BarG.Utilities.print_report import print_report
+from BarG.Utilities import print_report
 
 
 
@@ -118,7 +118,12 @@ for material in exp.materaials:
 
         ca.result_path = way_to_result
 
-        print_report(specimen).write_html(way_to_result + 'report.html')
+        print_report.machanisc(specimen).write_html(way_to_result + 'report.html')
+
+        if specimen.IR:
+            print_report.temperature(specimen).write_html(way_to_result + 'report_temperature.html')
+
+            
         ca.save_data()
 
         final_table.to_csv(way_to_result + 'result_data.txt', index = False, sep = '\t')

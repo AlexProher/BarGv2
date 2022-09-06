@@ -1,7 +1,8 @@
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
-def print_report(specimen):
+def machanisc(specimen):
     plots = [
                 go.Scatter(name='Incident', y=specimen.raw_incid, x=specimen.raw_time,
                         mode='lines', visible=True),
@@ -31,59 +32,49 @@ def print_report(specimen):
 
                 go.Scatter(name='Stress_True', y=specimen.true_stress,
                                                 x=specimen.true_strain, mode='lines', visible=False),
-
-                go.Scatter(name='Stress_True', y=specimen.temperature,
-                                                x=specimen.true_strain, mode='lines', visible=False)
             ]
     buttons = [
                 dict(label='Raw Signals',
                     method='update',
-                    args=[{'visible': [True] * 2 + [False] * 9},
+                    args=[{'visible': [True] * 2 + [False] * 8},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Amplitude [V]'},
                             'showlegend': True}]),
 
                 dict(label='Corrected Signals',
                     method='update',
-                    args=[{'visible': [False]* 2 + [True] * 2 + [False] * 7},
+                    args=[{'visible': [False]* 2 + [True] * 2 + [False] * 6},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Amplitude [V]'},
                             'showlegend': True}]),
 
                 dict(label='Displacement',
                     method='update',
-                    args=[{'visible': [False] * 4 + [True] + [False] * 6},
+                    args=[{'visible': [False] * 4 + [True] + [False] * 5},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Displacement [m]'},
                             'showlegend': True}]),
 
                 dict(label='Forces',
                     method='update',
-                    args=[{'visible': [False] * 5 + [True] * 2 + [False] * 4},
+                    args=[{'visible': [False] * 5 + [True] * 2 + [False] * 3},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Force [N]'},
                             'showlegend': True}]),
 
                 dict(label='Velocities',
                     method='update',
-                    args=[{'visible': [False] * 7 + [True] + [False] * 3},
+                    args=[{'visible': [False] * 7 + [True] + [False] * 2},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Velocity [m/s]'},
                             'showlegend': True}]),
 
                 dict(label='Stress - Strain',
                     method='update',
-                    args=[{'visible': [False] * 8 + [True] * 2 + [False]},
+                    args=[{'visible': [False] * 8 + [True] * 2},
                         {'xaxis': {'title': 'Strain'},
                             'yaxis': {'title': 'Stress [MPa]'},
                             'showlegend': True}]), 
-
-                dict(label='Temperature',
-                    method='update',
-                    args=[{'visible': [False] * 9 + [True] * 2},
-                        {'xaxis': {'title': 'Strain'},
-                            'yaxis': {'title': 'Stress [MPa]'},
-                            'showlegend': True}]),
                             ] 
     layot = go.Layout(title_x=0.5, template='none',
                     title = f'{specimen.material} {specimen.title}',
@@ -95,3 +86,25 @@ def print_report(specimen):
 
     fig = go.Figure(data = plots, layout = layot)
     return fig
+
+def temperature(specimen):
+    fig1 = make_subplots(specs=[[{"secondary_y": True}]])
+
+    fig1.update_layout(template = 'none', 
+                        font=dict(size=16),
+                        title = f'{specimen.material} {specimen.title}')
+
+    fig1.add_trace(go.Scatter(x = specimen.true_strain, 
+                                y = specimen.true_stress,
+                                name = 'True Stress'),
+                                secondary_y=False)
+    fig1.add_trace(go.Scatter(x = specimen.true_strain, 
+                                y = specimen.temperature, 
+                                name = 'Temperature'),
+                                secondary_y=True)
+
+    fig1.update_xaxes(title_text="Strain")
+
+    fig1.update_yaxes(title_text="Stress, [MPa]", secondary_y=False)
+    fig1.update_yaxes(title_text="Temperature rise, C", secondary_y=True)
+    return fig1
