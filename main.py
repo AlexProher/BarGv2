@@ -5,6 +5,7 @@ import os
 
 from BarG.Analysis.CoreAnalyzer import CoreAnalyzer
 from BarG.Analysis.CoreAnalyzer import Material, Experiment, Specimen
+from BarG.Utilities.print_report import print_report
 
 
 
@@ -77,7 +78,7 @@ for material in exp.materaials:
         specimen.time = ca.time
         specimen.incid = ca.corr_incid.y
         specimen.trans = ca.corr_trans.y
-        specimen.refle = ca.corr_refle.y
+        specimen.reflect = ca.corr_refle.y
         specimen.u_in = ca.u_in
         specimen.u_out = ca.u_out
         specimen.eng_strain = ca.eng_stress_strain[0]
@@ -90,6 +91,7 @@ for material in exp.materaials:
 
         specimen.temperature = ca.temperature
         specimen.time_IR = ca.time_IR
+
     
 
 
@@ -97,7 +99,7 @@ for material in exp.materaials:
         final_table = pd.DataFrame({'time':  specimen.time,
                                     'incid': specimen.incid,
                                     'trans': specimen.trans,
-                                    'refl': specimen.refle,
+                                    'refl': specimen.reflect,
                                     'U_in': specimen.u_in,
                                     'U_out': specimen.u_out,
                                     'eng_strain': specimen.eng_strain,
@@ -115,6 +117,8 @@ for material in exp.materaials:
             os.makedirs(way_to_result)
 
         ca.result_path = way_to_result
+
+        print_report(specimen).write_html(way_to_result + 'report.html')
         ca.save_data()
 
         final_table.to_csv(way_to_result + 'result_data.txt', index = False, sep = '\t')

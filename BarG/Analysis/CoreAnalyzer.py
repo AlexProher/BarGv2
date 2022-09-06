@@ -57,7 +57,12 @@ class Specimen:
     
     def __init__(self, specimen):
         self.title = specimen
+        self.material = None
         self.index = None
+
+        self.raw_incid = None
+        self.raw_transm = None
+        self.raw_time = None
 
         self.l = None
         self.d = None
@@ -70,7 +75,7 @@ class Specimen:
         self.time = None
         self.incid = None
         self.trans = None
-        self.refle = None
+        self.reflect = None
         self.u_in = None
         self.u_out = None
         self.eng_strain = None
@@ -160,6 +165,11 @@ class CoreAnalyzer:
                 incid = signal2.vol-signal2.vol[0]
                 transm = signal1.vol-signal1.vol[0]
             time = signal1.sec
+
+            self.current_specimen.raw_incid = incid
+            self.current_specimen.raw_transm = transm
+            self.current_specimen.raw_time = time
+
             self.load_experiments(np.array(incid), np.array(transm), np.array(time))
 
         if self.ir_mode:
