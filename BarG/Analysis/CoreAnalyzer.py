@@ -166,7 +166,7 @@ class CoreAnalyzer:
             IR_calculation(self)
         else:
             self.update_logger('No IR data to analyse')
-
+        self.update_logger(f'temperature {len(self.temperature)} - stress {len(self.true_stress_strain[1])}')
         return True
         
 

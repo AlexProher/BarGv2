@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 from scipy.optimize import curve_fit
+import BarG.Calculators.cut_temperature as ct
 
 
 
@@ -54,6 +55,11 @@ def IR_calculation(ca, tr_c = 0.9):
             temperature.append(0)
         time.append(ind/this_header[20])
 
+    if ca.current_specimen.valid:
+
+        time, temperature = ct.cut_signal(ca.true_stress_strain[0], temperature, ca.time, time)
+
+
     ca.temperature = temperature
     ca.time_IR = time
 
@@ -74,7 +80,8 @@ def make_a_movie(ca, header, data):
     
     return wrapper(data, material, specimen, frame_rate)
 
-    
+def correct_temperaature():
+    pass    
     
     
 def wrapper(data, material, specimen, frame_rate):

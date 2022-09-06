@@ -61,7 +61,7 @@ for material in exp.materaials:
                 np_param = np.array([specimen.d, 
                                     specimen.l, 
                                     *param.iloc[:,1]])
-                                    
+
             #Need to think about it                        
             #else:
             #    specimen.mech = False
@@ -90,7 +90,7 @@ for material in exp.materaials:
 
         specimen.temperature = ca.temperature
         specimen.time_IR = ca.time_IR
-
+    
 
 
         #формируем итоговую таблицу
@@ -106,6 +106,7 @@ for material in exp.materaials:
                                     'true_stress': specimen.true_stress,
                                     'F_in': specimen.F_in,
                                     'F_out': specimen.F_out,
+                                    'Temperature': specimen.temperature
                                     })
         
         way_to_result = way + "/" + 'results_' + material.title + "/" + specimen.title + "/" 
