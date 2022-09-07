@@ -6,6 +6,7 @@ import os
 from BarG.Analysis.CoreAnalyzer import CoreAnalyzer
 from BarG.Analysis.CoreAnalyzer import Material, Experiment, Specimen
 from BarG.Utilities import print_report
+from BarG.Utilities import material_report as mr
 
 
 
@@ -89,6 +90,9 @@ for material in exp.materaials:
         specimen.true_strain = ca.true_stress_strain[0]
         specimen.true_stress = ca.true_stress_strain[1]
 
+        specimen.raw_temperature = ca.raw_temperature
+        specimen.raw_time_IR = ca.raw_time_IR
+
         specimen.temperature = ca.temperature
         specimen.time_IR = ca.time_IR
 
@@ -123,10 +127,16 @@ for material in exp.materaials:
         if specimen.IR:
             print_report.temperature(specimen).write_html(way_to_result + 'report_temperature.html')
 
-            
+        
         ca.save_data()
 
         final_table.to_csv(way_to_result + 'result_data.txt', index = False, sep = '\t')
     
+    
+    reports = mr.print_report(material)
+    reports[0].write_html(way + "/" + 'results_' + material.title + "/" + 'mech_report.html')
+    
+    if reports[1]._data_objs:
+        reports[1].write_html(way + "/" + 'results_' + material.title + "/" + 'thermal_report.html')
     #print(material.get_list_specimens())
     

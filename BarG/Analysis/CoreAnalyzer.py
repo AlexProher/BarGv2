@@ -85,8 +85,12 @@ class Specimen:
         self.true_strain = None
         self.true_strain = None
 
+        self.raw_temperature = None
+        self.raw_time_IR = None
+
         self.temperature = None
         self.time_IR = None
+
 
 
 class CoreAnalyzer:
@@ -135,6 +139,9 @@ class CoreAnalyzer:
 
         self.ir_mode = specimen.IR
         self.mech_exp = specimen.mech
+
+        self.raw_temperature = None
+        self.raw_time_IR = None
         self.temperature = None
         self.time_IR = None
 
