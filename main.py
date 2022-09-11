@@ -11,9 +11,11 @@ from BarG.Utilities import material_report as mr
 
 
 
-way = '/Users/lubimyj/Git/experiments/Plansee-Tungstan-W/'
+#way = '/Users/lubimyj/Git/experiments/Plansee-Tungstan-W/'
+way = '/Users/lubimyj/Git/experiments/RAF/'
 
 materials = os.listdir(way)
+#materials = ['12_06_22_1k']
 exp = Experiment([Material(item) for item in materials if ('result' not in item) and ('.' not in item)])
 
 
@@ -135,7 +137,7 @@ for material in exp.materaials:
     
     reports = mr.print_report(material)
     reports[0].write_html(way + "/" + 'results_' + material.title + "/" + 'mech_report.html')
-    
+
     if reports[1]._data_objs:
         reports[1].write_html(way + "/" + 'results_' + material.title + "/" + 'thermal_report.html')
     #print(material.get_list_specimens())

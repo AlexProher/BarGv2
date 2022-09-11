@@ -165,7 +165,7 @@ class CoreAnalyzer:
 
             #Определяем кто из них какой
         if self.mech_exp:
-            if max(signal1.vol) > max(signal2.vol):
+            if min(signal1.vol) < min(signal2.vol):
                 incid = signal1.vol-signal1.vol[0]
                 transm = signal2.vol-signal2.vol[0]
             else:
@@ -181,9 +181,10 @@ class CoreAnalyzer:
 
         if self.ir_mode:
             IR_calculation(self)
+            self.update_logger(f'temperature {len(self.temperature)} - stress {len(self.true_stress_strain[1])}')
         else:
             self.update_logger('No IR data to analyse')
-        self.update_logger(f'temperature {len(self.temperature)} - stress {len(self.true_stress_strain[1])}')
+        
         return True
         
 

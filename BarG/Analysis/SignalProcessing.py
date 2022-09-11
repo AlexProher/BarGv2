@@ -84,37 +84,39 @@ def auto_crop(update_logger, CA):
     
     #   The following will look for the point where the wave changes its sign from both sides,
     #   Obtaining these points is crucial for determining where to crop the signal to export the different waves.
-
+    noize = np.random.random(len(CA.incid_og.y))*2e-4 #make some noize
     #   For incident wave:
     incid_before_idx = peaks_incid[0]
-    while K * CA.incid_og.y[incid_before_idx] < 0:
+    while K * CA.incid_og.y[incid_before_idx]+noize[incid_before_idx] < 0:
         incid_before_idx -= 1
 
     incid_after_idx = peaks_incid[0]
-    while K * CA.incid_og.y[incid_after_idx] < 0:
+    while K * CA.incid_og.y[incid_after_idx] + noize[incid_after_idx] < 0:
         incid_after_idx += 1
 
-    vcc_incid = CA.incid_og.y[incid_before_idx - CA.spacing: incid_after_idx + 2 * CA.spacing]
-    time_incid = CA.incid_og.x[incid_before_idx - CA.spacing: incid_after_idx + 2 * CA.spacing]
+    vcc_incid = CA.incid_og.y[incid_before_idx - CA.spacing: incid_after_idx + 1 * CA.spacing]
+    time_incid = CA.incid_og.x[incid_before_idx - CA.spacing: incid_after_idx + 1 * CA.spacing]
 
     #   We want all three waves to be of the same vector size, so we will use the total time of the incident wave,
     #   and only find where the other two waves begin.
     signal_time = incid_after_idx - incid_before_idx
 
     #   For reflected wave:
-    before_idx = peaks_incid[1]
-    while K * CA.incid_og.y[before_idx] > 0:
-        before_idx -= 1
+    #before_idx = peaks_incid[1]
+    #while K * CA.incid_og.y[before_idx] > 0:
+    #    before_idx -= 1
 
+
+    before_idx = incid_before_idx + int(CA.first_gage*2/CA.sound_velocity*2000000)
     #   Total cropping time
     after_idx = before_idx + signal_time
     reflected_idx = before_idx
-    vcc_reflected = CA.incid_og.y[before_idx - CA.spacing: after_idx + 2 * CA.spacing]
-    time_reflected = CA.incid_og.x[before_idx - CA.spacing: after_idx + 2 * CA.spacing]
+    vcc_reflected = CA.incid_og.y[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
+    time_reflected = CA.incid_og.x[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
 
     #   For transmitted wave:
     before_idx = peaks_trans[0]
-    while K * CA.trans_og.y[before_idx] < 0:
+    while K * CA.trans_og.y[before_idx]+ noize[before_idx] < 0:
         before_idx -= 1
 
     #   Total cropping time
@@ -133,8 +135,8 @@ def auto_crop(update_logger, CA):
     plt.show()
     '''
 
-    vcc_trans = CA.trans_og.y[before_idx - CA.spacing: after_idx + 2 * CA.spacing]
-    time_trans = CA.trans_og.x[before_idx - CA.spacing: after_idx + 2 * CA.spacing]
+    vcc_trans = CA.trans_og.y[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
+    time_trans = CA.trans_og.x[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
 
     zeroing([time_incid, time_reflected, time_trans])
 

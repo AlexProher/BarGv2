@@ -12,7 +12,11 @@ def machanisc(specimen):
                 
                 go.Scatter(name='Incident', y=specimen.incid, x=specimen.time,
                         mode='lines', visible=False),
+
                 go.Scatter(name='Reflected', y=specimen.reflect, x=specimen.time,
+                        mode='lines', visible=False),
+                
+                go.Scatter(name='Transmitted', y=specimen.trans, x=specimen.time,
                         mode='lines', visible=False),
 
                 go.Scatter(name='U_in', y=specimen.u_in, x=specimen.time,
@@ -36,42 +40,42 @@ def machanisc(specimen):
     buttons = [
                 dict(label='Raw Signals',
                     method='update',
-                    args=[{'visible': [True] * 2 + [False] * 8},
+                    args=[{'visible': [True] * 2 + [False] * 9},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Amplitude [V]'},
                             'showlegend': True}]),
 
                 dict(label='Corrected Signals',
                     method='update',
-                    args=[{'visible': [False]* 2 + [True] * 2 + [False] * 6},
+                    args=[{'visible': [False]* 2 + [True] * 3 + [False] * 6},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Amplitude [V]'},
                             'showlegend': True}]),
 
                 dict(label='Displacement',
                     method='update',
-                    args=[{'visible': [False] * 4 + [True] + [False] * 5},
+                    args=[{'visible': [False] * 5 + [True] + [False] * 5},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Displacement [m]'},
                             'showlegend': True}]),
 
                 dict(label='Forces',
                     method='update',
-                    args=[{'visible': [False] * 5 + [True] * 2 + [False] * 3},
+                    args=[{'visible': [False] * 6 + [True] * 2 + [False] * 3},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Force [N]'},
                             'showlegend': True}]),
 
                 dict(label='Velocities',
                     method='update',
-                    args=[{'visible': [False] * 7 + [True] + [False] * 2},
+                    args=[{'visible': [False] * 8 + [True] + [False] * 2},
                         {'xaxis': {'title': 'Time [μs]'},
                             'yaxis': {'title': 'Velocity [m/s]'},
                             'showlegend': True}]),
 
                 dict(label='Stress - Strain',
                     method='update',
-                    args=[{'visible': [False] * 8 + [True] * 2},
+                    args=[{'visible': [False] * 9 + [True] * 2},
                         {'xaxis': {'title': 'Strain'},
                             'yaxis': {'title': 'Stress [MPa]'},
                             'showlegend': True}]), 
