@@ -7,7 +7,7 @@ def machanisc(specimen):
                 go.Scatter(name='Incident', y=specimen.raw_incid, x=specimen.raw_time,
                         mode='lines', visible=True),
 
-                go.Scatter(name='Reflected', y=specimen.raw_transm, x=specimen.raw_time,
+                go.Scatter(name='Transmitted', y=specimen.raw_transm, x=specimen.raw_time,
                         mode='lines', visible=True),
                 
                 go.Scatter(name='Incident', y=specimen.incid, x=specimen.time,

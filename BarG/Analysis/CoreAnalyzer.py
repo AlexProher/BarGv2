@@ -15,17 +15,35 @@ from BarG.Utilities.TwoDimVec import TwoDimVec
 class Experiment:
     def __init__(self, materials = None):
         if materials:
-            self.materaials = materials
-            self.list_materaials = [material.title for material in materials]
+            self.materials = materials
+            self.list_materials = [material.title for material in materials]
         else:
             self.materaials = []
-            self.list_materaials = []
+            self.list_materials = []
 
     def add_material(self, material):
         if not isinstance(material, Material):
             return False
         self.materals.append(material)
-        self.list_materaials.append(material.title)
+        self.list_materials.append(material.title)
+
+    def get_material(self, material):
+        if isinstance(material, int):
+            if material <= len(self.list_materials):
+                return self.materials[material]
+            else:
+                print(f'Choose number from 0 to {len(self.list_materials)}')
+        elif isinstance(material, str):
+            if material in self.list_materials:
+                return self.materials[self.list_materials.index(material)]
+            else:
+                print(f'No such material, choose from list {self.list_materials}')
+        else:
+            print(f'Choose number from 0 to {len(self.list_materials)} or title from list {self.list_materials}')
+
+    def __call__(self, title):
+        pass
+
 
 class Material:
     def __init__(self, material):
@@ -33,6 +51,9 @@ class Material:
         self.__list_specimens = []
         self.__specimens = []
         self.__specimen_counter = -1
+
+    
+
 
     def add_specimen(self, specimen):
 
@@ -50,6 +71,8 @@ class Material:
         
     def get_specimens(self):
         return self.__specimens
+
+    
 
     def get_list_specimens(self):
         return self.__list_specimens
@@ -91,7 +114,11 @@ class Specimen:
         self.temperature = None
         self.time_IR = None
 
-
+    def __str__(self):
+        return self.title
+    
+    def __repr__(self):
+        return self.title
 
 class CoreAnalyzer:
 
