@@ -130,6 +130,7 @@ def make_analysis(way):
             specimen.raw_temperature = ca.raw_temperature
             specimen.raw_time_IR = ca.raw_time_IR
 
+            specimen.strain_rate = ca.mean_strain_rate
             specimen.temperature = ca.temperature
             specimen.time_IR = ca.time_IR
 

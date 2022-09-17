@@ -19,7 +19,7 @@ def print_report(material):
 
 
     for item in material.get_specimens():
-        trace_mech = go.Scatter(x = item.true_strain, y = item.true_stress, name = item.title)
+        trace_mech = go.Scatter(x = item.true_strain, y = item.true_stress, name = f'{item.title} - sr {round(item.strain_rate,2)}')
         fig1.add_trace(trace_mech)
         if item.IR:
             trace_temperature = go.Scatter(x = item.raw_time_IR, y = item.raw_temperature, name = item.title)

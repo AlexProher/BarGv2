@@ -172,7 +172,7 @@ def mean_of_signal(update_logger, signal, prominence_percent, mode, spacing):
         k = -1
 
     #   Find the first peak of the signal, with a prominence of half the peak's value:
-    peaks, _ = find_peaks(smooth_signal, prominence = peak_value * prominence_percent)
+    peaks, _ = find_peaks(smooth_signal, prominence = peak_value * prominence_percent/100)
     if len(peaks) == 0:
         return -1
     peak = peaks[0]
