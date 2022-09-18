@@ -172,6 +172,10 @@ def make_analysis(way):
         
         
         material.reports = mr.print_report(material)
+        material.table = mr.generate_table(material)
+
+        material.table.to_csv(way + "/" + 'results_' + material.title + "/" + 'mech_report_table.csv', sep = '\t')
+
         material.reports[0].write_html(way + "/" + 'results_' + material.title + "/" + 'mech_report.html')
 
         if material.reports[1]._data_objs:

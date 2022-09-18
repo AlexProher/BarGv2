@@ -106,7 +106,7 @@ class Specimen:
         self.F_in = None
         self.F_out = None
         self.true_strain = None
-        self.true_strain = None
+        self.true_stress = None
 
         self.raw_temperature = None
         self.raw_time_IR = None
@@ -129,6 +129,7 @@ class CoreAnalyzer:
         self.path_folder = path
         self.result_path = None
         self.parameters = parameters
+        self.current_specimen.parameters = parameters
 
         self.incid = TwoDimVec()
         self.trans = TwoDimVec()

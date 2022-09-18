@@ -1,4 +1,5 @@
 from turtle import title
+import pandas as pd
 import plotly.graph_objects as go
 
 def print_report(material):
@@ -19,10 +20,22 @@ def print_report(material):
 
 
     for item in material.get_specimens():
-        trace_mech = go.Scatter(x = item.true_strain, y = item.true_stress, name = f'{item.title} - sr {round(item.strain_rate,2)}')
+        trace_mech = go.Scatter(x = item.true_strain, y = item.true_stress, name = f'{item.title}')
         fig1.add_trace(trace_mech)
         if item.IR:
             trace_temperature = go.Scatter(x = item.raw_time_IR, y = item.raw_temperature, name = item.title)
             fig2.add_trace(trace_temperature)
         
     return fig1, fig2
+
+
+def generate_table(material):
+    report = pd.DataFrame()
+    for item in material.get_specimens():
+        report = pd.concat([report, pd.DataFrame({'diameter [mm]': item.d*1000,
+                                    'length [mm]': item.l*1000,
+                                    'Ult.Stress [MPa]': round(max(item.true_stress)),
+                                    'Strain for Ult.Stress': round(item.true_strain[item.true_stress.index(max(item.true_stress))],4),
+                                    'Strain Rate [1/s]': round(item.strain_rate,2)
+                                    }, index=[item.title])], axis = 0)
+    return report
