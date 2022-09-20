@@ -135,6 +135,19 @@ def final_calculation(update_logger, CA):
     CA.true_stress_strain = [true_strain, true_stress]
     CA.eng_stress_strain = [eng_strain, eng_stress]
 
+    np_true_stress = np.array(true_stress)
+    np_true_strain = np.array(true_strain)
+
+    corr_idx=np.where(np_true_stress>5)[0][0]
+
+    CA.corr_true_strain = np_true_strain[corr_idx:]-np_true_strain[corr_idx]
+    
+    CA.corr_true_stress = np_true_stress[corr_idx:]
+
+    max_stress_index = list(CA.corr_true_stress).index(max(CA.corr_true_stress))
+    
+    CA.energy = sum([CA.corr_true_stress[index]*(CA.corr_true_strain[index+1]-CA.corr_true_strain[index]) for index in range(max_stress_index)])
+    #CA.energy = 0
     try:
         CA.mean_strain_rate = SignalProcessing.mean_of_signal(update_logger, eng_strain_rate[:-1], CA.prominence_percent, CA.mode,
                                                             CA.spacing)

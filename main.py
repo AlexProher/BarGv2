@@ -62,13 +62,18 @@ def make_analysis(way):
         files = os.listdir(way_to_material)
         files = [item for item in files if item[0] != '.'] ## на случей если в папке есть служебные файлы начинающиеся с "."
 
-        dim = [item for item in files if '.txt' in item][0]
-        
+        dim = [item for item in files if ('.txt' in item) and ('Parameters.txt' not in item)][0]
+        parameters = [item for item in files if 'Parameters.txt' in item][0]
+
         material.add_specimen([Specimen(item) for item in files if '.txt' not in item])
+
+        
 
         #Загружаем геометрические параметры образцов 
         if dim:
             shapes = pd.read_csv(way_to_material + dim, sep = '\t', index_col='name')
+            param = pd.read_csv(way_to_material + parameters,
+                                        header = None, sep='\t')
         else:
             print('NO mechanical experiment to analyse')
 
@@ -89,23 +94,12 @@ def make_analysis(way):
             files_on_item = os.listdir(way_to_item)
             files_on_item = [item for item in files_on_item if item[0] != '.'] ## на случей если в папке есть служебные файлы начинающиеся с "."
 
-            for item in files_on_item:
-                if 'Parameters.txt' in item:
-                    parameters = item
-                                    #Загружаем файл параметров для обработки экспериментов
-                    param = pd.read_csv(way_to_item + parameters,
-                                        header = None, sep='\t')
-                    
-
-                    np_param = np.array([specimen.d, 
+            np_param = np.array([specimen.d, 
                                         specimen.l, 
                                         *param.iloc[:,1]])
 
-                #Need to think about it                        
-                #else:
-                #    specimen.mech = False
-                #    np_param = np.zeros((13,1))
-
+            for item in files_on_item:
+                
                 if '_IR' in item:
                     specimen.IR = True
 
@@ -123,9 +117,13 @@ def make_analysis(way):
             specimen.eng_stress = ca.eng_stress_strain[1]
             specimen.F_in = ca.F_in
             specimen.F_out = ca.F_out
+            specimen.energy = ca.energy
 
             specimen.true_strain = ca.true_stress_strain[0]
             specimen.true_stress = ca.true_stress_strain[1]
+
+            specimen.corr_stress = ca.corr_true_stress
+            specimen.corr_strain = ca.corr_true_strain
 
             specimen.raw_temperature = ca.raw_temperature
             specimen.raw_time_IR = ca.raw_time_IR
@@ -150,6 +148,7 @@ def make_analysis(way):
                                         'true_stress': specimen.true_stress,
                                         'F_in': specimen.F_in,
                                         'F_out': specimen.F_out,
+                                        'Energy': specimen.energy,
                                         'Temperature': specimen.temperature
                                         })
             
@@ -161,6 +160,9 @@ def make_analysis(way):
             ca.result_path = way_to_result
 
             print_report.machanisc(specimen).write_html(way_to_result + 'report.html')
+
+            print_report.make_appx(specimen).write_image(way_to_result + f'{specimen.title}.png')
+            #print_report.make_appx(specimen).write_html(way_to_result + 'appx.html')
 
             if specimen.IR:
                 print_report.temperature(specimen).write_html(way_to_result + 'report_temperature.html')
@@ -177,6 +179,7 @@ def make_analysis(way):
         material.table.to_csv(way + "/" + 'results_' + material.title + "/" + 'mech_report_table.csv', sep = '\t')
 
         material.reports[0].write_html(way + "/" + 'results_' + material.title + "/" + 'mech_report.html')
+        material.reports[0].write_image(way + "/" + 'results_' + material.title + "/" + material.title + '.png')
 
         if material.reports[1]._data_objs:
             material.reports[1].write_html(way + "/" + 'results_' + material.title + "/" + 'thermal_report.html')

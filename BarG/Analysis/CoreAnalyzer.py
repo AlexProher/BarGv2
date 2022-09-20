@@ -107,6 +107,7 @@ class Specimen:
         self.F_out = None
         self.true_strain = None
         self.true_stress = None
+        self.energy = None
 
         self.raw_temperature = None
         self.raw_time_IR = None
@@ -151,9 +152,11 @@ class CoreAnalyzer:
         self.specimen_length = parameters[1]
         self.bar_diameter = parameters[2]
         self.young_modulus = parameters[3]
+        #self.young_modulus = 71.7e+9
         self.first_gage = parameters[4]
         self.second_gage = parameters[5]
         self.sound_velocity = parameters[6]
+        #self.sound_velocity = 5050
         self.gage_factor = parameters[7]
         self.bridge_tension = parameters[8]
         self.spacing = int(parameters[9])
@@ -265,17 +268,26 @@ class CoreAnalyzer:
 
     def single_analysis(self):
 
-        corr_incident, corr_transmitted, corr_reflected = dispersion_correction(self.update_logger, self)
+        #corr_incident, corr_transmitted, corr_reflected = dispersion_correction(self.update_logger, self)
 
         corr_incident, corr_transmitted, corr_reflected, \
         self.incid.x, self.trans.x, self.refle.x \
-            = SignalProcessing.cross_correlate_signals(self.update_logger, corr_incident, corr_transmitted,
-                                                       corr_reflected,
-                                                       self.incid.x, self.trans.x, self.refle.x,
+            = SignalProcessing.cross_correlate_signals(self.update_logger, 
+                                                    self.incid.y,self.trans.y,self.refle.y,
+                                                      self.incid.x, self.trans.x, self.refle.x,
                                                        self.smooth_value)
+ # corr_incident, corr_transmitted,corr_reflected,
+
+
         self.corr_incid.y = corr_incident
         self.corr_trans.y = corr_transmitted
         self.corr_refle.y = corr_reflected
+
+        #self.corr_incid.y = self.incid.y
+        #self.corr_trans.y = self.trans.y
+        #self.corr_refle.y = self.refle.y
+
+
 
         return FinalCalculation.final_calculation(self.update_logger, self)
 

@@ -105,7 +105,7 @@ def auto_crop(update_logger, CA):
     #before_idx = peaks_incid[1]
     #while K * CA.incid_og.y[before_idx] > 0:
     #    before_idx -= 1
-
+    
 
     before_idx = incid_before_idx + int(CA.first_gage*2/CA.sound_velocity*2000000)
     #   Total cropping time
@@ -115,9 +115,9 @@ def auto_crop(update_logger, CA):
     time_reflected = CA.incid_og.x[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
 
     #   For transmitted wave:
-    before_idx = peaks_trans[0]
-    while K * CA.trans_og.y[before_idx]+ noize[before_idx] < 0:
-        before_idx -= 1
+    before_idx = incid_before_idx + int((CA.first_gage + CA.second_gage)/CA.sound_velocity*2000000)+int((CA.current_specimen.l/CA.sound_velocity*2000000))
+    #while K * CA.trans_og.y[before_idx]+ noize[before_idx] < 0:
+    #    before_idx -= 1
 
     #   Total cropping time
     after_idx = before_idx + signal_time

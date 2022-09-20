@@ -1,3 +1,4 @@
+from tkinter import font
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
@@ -185,7 +186,7 @@ def machanisc(specimen):
                             x=1.02,
                             y=0.75,
                             showarrow=False,
-                            text=f"Strain for Ult.Stress = {str(round(specimen.true_strain[specimen.true_stress.index(max(specimen.true_stress))],4))}",
+                            text=f"Strain for Ult.Stress = {str(round(specimen.corr_strain[list(specimen.corr_stress).index(max(specimen.corr_stress))],4))}",
                             textangle=0,
                             xanchor='left',
                             xref="paper",
@@ -226,3 +227,142 @@ def temperature(specimen):
     fig1.update_yaxes(title_text="Stress, [MPa]", secondary_y=False)
     fig1.update_yaxes(title_text="Temperature rise, C", secondary_y=True)
     return fig1
+
+
+def make_appx(sp2):
+
+
+
+    fig = make_subplots(rows = 2, cols = 2, column_widths=[0.7, 0.3])
+    fig.update_layout(template = None, title = sp2.title)
+
+    fig.add_trace(go.Scatter(x = sp2.raw_time * 1e6, y = sp2.raw_incid[:int(len(sp2.raw_incid)/2)]*1e3, name = 'Incident'), 1, 1)
+    fig.add_trace(go.Scatter(x = sp2.raw_time * 1e6, y = sp2.raw_transm[:int(len(sp2.raw_transm)/2)]*1e3, name = 'Transmitted'), 1, 1)
+
+    fig.update_xaxes(title_text="Time, us", row=1, col=1, title_font = {"size": 20}, tickfont = {"size": 20})
+    fig.update_xaxes(title_text="Time, us", row=2, col=1, title_font = {"size": 20},tickfont = {"size": 20})
+
+    fig.add_trace(go.Scatter(y = np.array(sp2.F_in)/1e3, x = np.array(sp2.time)* 1e6, name = 'F_in'), 2, 1)
+    fig.add_trace(go.Scatter(y = np.array(sp2.F_out)/1e3, x = np.array(sp2.time)* 1e6, name = 'F_out'), 2, 1)
+
+    fig.update_yaxes(title_text="Voltage, mV", row=1, col=1, title_font = {"size": 20}, tickfont = {"size": 20})
+    fig.update_yaxes(title_text="Force, kN", row=2, col=1, title_font = {"size": 20}, tickfont = {"size": 20})
+
+    posx = 0.7
+    posy = 0.75
+    fig.update_layout(legend=dict(
+                                
+                                yanchor="top",    
+                                y=1.1,
+                                xanchor="center",
+                                x=0.8))
+
+    fig.add_annotation(dict(font=dict(color='black', size=22),
+                                
+                            x=posx,
+                            y=posy+0.05,
+                            showarrow=False,
+                            text="<b>Experiment Parameters:<b>",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+    fig.add_annotation(dict(font=dict(color='black', size=20),
+                        
+                            x=posx,
+                            y=posy - 0.14,
+                            showarrow=False,
+                            text=f"Ultimate stress = {str(round(max(sp2.true_stress)))} [MPa]",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+    fig.add_annotation(dict(font=dict(color='black', size=20),
+                            
+                            x=posx,
+                            y=posy - 0.22,
+                            showarrow=False,
+                            text=f"Strain for Ult.Stress = {str(round(sp2.true_strain[sp2.true_stress.index(max(sp2.true_stress))],4))}",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+    fig.add_annotation(dict(font=dict(color='black', size=20),
+                            
+                            x=posx,
+                            y=posy - 0.3,
+                            showarrow=False,
+                            text=f"Strain rate = {str(round(sp2.strain_rate,2))} [1/s]",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+
+    fig.add_annotation(dict(font=dict(color='black', size=20),
+                            
+                            x=posx,
+                            y=posy - 0.38,
+                            showarrow=False,
+                            text=f"Spec.diameter = {str(round(sp2.parameters[0]*1e6) * 1000 / 1e6)} [mm]",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+    fig.add_annotation(dict(font=dict(color='black', size=20),
+                            
+                            x=posx,
+                            y=posy - 0.5,
+                            showarrow=False,
+                            text=f"Spec.length = {str(round(sp2.parameters[1]*1e6) * 1000 / 1e6)} [mm]",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+    fig.add_annotation(dict(font=dict(color='black', size=20),
+                            
+                            x=posx,
+                            y=posy - 0.58,
+                            showarrow=False,
+                            text=f"Bar diameter = {str(round(sp2.parameters[2]*1e6) * 1000 / 1e6)} [mm]",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+    fig.add_annotation(dict(font=dict(color='black', size=20),
+                            
+                            x=posx,
+                            y=posy - 0.65,
+                            showarrow=False,
+                            text=f"Bar Young's mod. = {str(sp2.parameters[3] / (10 ** 9))} [GPa]",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+    fig.add_annotation(dict(font=dict(color='black', size=20),
+                            
+                            x=posx,
+                            y=posy - 0.03,
+                            showarrow=False,
+                            text=f"Sound vel = {str(sp2.parameters[6])} [m/s]",
+                            textangle=0,
+                            xanchor='left',
+                            xref="paper",
+                            yref="paper"))
+
+
+
+    fig.update_layout(width = 1000, height = 700, font = dict(size = 20))
+
+    return fig
+
+
+
+
