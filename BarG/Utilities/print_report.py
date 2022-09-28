@@ -236,11 +236,11 @@ def make_appx(sp2):
     fig = make_subplots(rows = 2, cols = 2, column_widths=[0.7, 0.3])
     fig.update_layout(template = None, title = sp2.title)
 
-    fig.add_trace(go.Scatter(x = sp2.raw_time * 1e6, y = sp2.raw_incid[:int(len(sp2.raw_incid)/2)]*1e3, name = 'Incident'), 1, 1)
-    fig.add_trace(go.Scatter(x = sp2.raw_time * 1e6, y = sp2.raw_transm[:int(len(sp2.raw_transm)/2)]*1e3, name = 'Transmitted'), 1, 1)
+    fig.add_trace(go.Scatter(x = sp2.raw_time * 1e6, y = sp2.raw_incid*1e3, name = 'Incident'), 1, 1)
+    fig.add_trace(go.Scatter(x = sp2.raw_time * 1e6, y = sp2.raw_transm*1e3, name = 'Transmitted'), 1, 1)
 
     fig.update_xaxes(title_text="Time, us", row=1, col=1, title_font = {"size": 20}, tickfont = {"size": 20})
-    fig.update_xaxes(title_text="Time, us", row=2, col=1, title_font = {"size": 20},tickfont = {"size": 20})
+    fig.update_xaxes(title_text="Time, us", row=2, col=1, title_font = {"size": 20}, tickfont = {"size": 20})
 
     fig.add_trace(go.Scatter(y = np.array(sp2.F_in)/1e3, x = np.array(sp2.time)* 1e6, name = 'F_in'), 2, 1)
     fig.add_trace(go.Scatter(y = np.array(sp2.F_out)/1e3, x = np.array(sp2.time)* 1e6, name = 'F_out'), 2, 1)

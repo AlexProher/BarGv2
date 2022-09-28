@@ -70,8 +70,11 @@ def final_calculation(update_logger, CA):
     if idx == 0:
         idx = len(eng_strain)
 
-    eng_strain = abs(eng_strain[:idx])
-    eng_stress = eng_stress[:idx]
+    # Here I am cut the stress-strain curves and shift it according "CA.trans_shift" parameter    
+
+    eng_strain = abs(eng_strain[CA.trans_shift+CA.spacing:idx]) - abs(eng_strain[CA.trans_shift+CA.spacing])
+    eng_stress = eng_stress[CA.trans_shift+CA.spacing:idx] - eng_stress[CA.trans_shift+CA.spacing]
+    corr_time = time[CA.trans_shift+CA.spacing:idx] - time[CA.trans_shift+CA.spacing]
 
     #   Calculate the average (mean) striker velocity:
     CA.mean_striker_velocity = SignalProcessing.mean_of_signal(update_logger,
@@ -127,7 +130,7 @@ def final_calculation(update_logger, CA):
     else:
         K = 1
 
-    for i in range(idx):
+    for i in range(len(eng_strain)):
         surf_spec_inst.append(abs(specimen_surface / (1 + K * strain[i])))
         true_stress.append(abs(eng_stress[i] * (1 + K * strain[i])))
         true_strain.append(abs(np.log(1 + K * strain[i])))
@@ -135,18 +138,22 @@ def final_calculation(update_logger, CA):
     CA.true_stress_strain = [true_strain, true_stress]
     CA.eng_stress_strain = [eng_strain, eng_stress]
 
+
+
     np_true_stress = np.array(true_stress)
     np_true_strain = np.array(true_strain)
 
-    corr_idx=np.where(np_true_stress>5)[0][0]
+    #corr_idx=np.where(np_true_stress>5)[0][0]
 
-    CA.corr_true_strain = np_true_strain[corr_idx:]-np_true_strain[corr_idx]
+    CA.corr_true_strain = np_true_strain
     
-    CA.corr_true_stress = np_true_stress[corr_idx:]
+    CA.corr_true_stress = np_true_stress
+    CA.corr_time = corr_time
 
-    max_stress_index = list(CA.corr_true_stress).index(max(CA.corr_true_stress))
+
+    max_stress_index = list(true_stress).index(max(true_stress))
     
-    CA.energy = sum([CA.corr_true_stress[index]*(CA.corr_true_strain[index+1]-CA.corr_true_strain[index]) for index in range(max_stress_index)])
+    CA.energy = sum([true_stress[index]*(true_strain[index+1]-true_strain[index]) for index in range(max_stress_index)])
     #CA.energy = 0
     try:
         CA.mean_strain_rate = SignalProcessing.mean_of_signal(update_logger, eng_strain_rate[:-1], CA.prominence_percent, CA.mode,

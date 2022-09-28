@@ -60,7 +60,7 @@ def IR_calculation(ca, tr_c = 0.9):
 
     if ca.current_specimen.valid:
 
-        time, temperature, eq_strain = ct.cut_signal(ca.true_stress_strain[0], temperature, ca.time, time)
+        time, temperature, eq_strain = ct.cut_signal(ca.true_stress_strain[0], temperature, ca.corr_time, time)
 
 
     ca.temperature = temperature

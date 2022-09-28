@@ -143,12 +143,12 @@ def make_analysis(way):
                                         'refl': specimen.reflect,
                                         'U_in': specimen.u_in,
                                         'U_out': specimen.u_out,
-                                        'eng_strain': specimen.eng_strain,
-                                        'eng_stress': specimen.eng_stress,
-                                        'true_strain': specimen.true_strain,
-                                        'true_stress': specimen.true_stress,
-                                        'F_in': specimen.F_in,
-                                        'F_out': specimen.F_out,
+                                        #'eng_strain': specimen.eng_strain,
+                                        #'eng_stress': specimen.eng_stress,
+                                        #'true_strain': specimen.true_strain,
+                                        #'true_stress': specimen.true_stress,
+                                        #'F_in': specimen.F_in,
+                                        #'F_out': specimen.F_out,
                                         'Energy': specimen.energy
                                         #'Temperature': specimen.temperature
                                         })

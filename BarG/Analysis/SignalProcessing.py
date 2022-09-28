@@ -82,45 +82,58 @@ def auto_crop(update_logger, CA):
     else:
         K = -1
     
-    #   The following will look for the point where the wave changes its sign from both sides,
-    #   Obtaining these points is crucial for determining where to crop the signal to export the different waves.
-    noize = np.random.random(len(CA.incid_og.y))*2e-4 #make some noize
-    #   For incident wave:
+    incid_threshold = 0.05 * max_incid
     incid_before_idx = peaks_incid[0]
-    while K * CA.incid_og.y[incid_before_idx]+noize[incid_before_idx] < 0:
+    while K * CA.incid_og.y[incid_before_idx] < - incid_threshold:
         incid_before_idx -= 1
 
     incid_after_idx = peaks_incid[0]
-    while K * CA.incid_og.y[incid_after_idx] + noize[incid_after_idx] < 0:
+    while K * CA.incid_og.y[incid_after_idx] < - incid_threshold:
         incid_after_idx += 1
 
-    vcc_incid = CA.incid_og.y[incid_before_idx - CA.spacing: incid_after_idx + 1 * CA.spacing]
-    time_incid = CA.incid_og.x[incid_before_idx - CA.spacing: incid_after_idx + 1 * CA.spacing]
+    vcc_incid = CA.incid_og.y[incid_before_idx - CA.spacing: incid_after_idx + CA.spacing]
+    time_incid = CA.incid_og.x[incid_before_idx - CA.spacing: incid_after_idx + CA.spacing]
 
     #   We want all three waves to be of the same vector size, so we will use the total time of the incident wave,
     #   and only find where the other two waves begin.
     signal_time = incid_after_idx - incid_before_idx
 
     #   For reflected wave:
-    #before_idx = peaks_incid[1]
-    #while K * CA.incid_og.y[before_idx] > 0:
-    #    before_idx -= 1
-    
+    #reflected_before_idx = peaks_incid[1]
+    #while K * CA.incid_og.y[reflected_before_idx] > incid_threshold:
+    #    reflected_before_idx -= 1
 
-    before_idx = incid_before_idx + int(CA.first_gage*2/CA.sound_velocity*2000000)
+    # Calculate the beginning of reflected wave based on 
+    # first strain gage position and soun velocity
+
+    reflected_before_idx = incid_before_idx + int(CA.first_gage*2/CA.sound_velocity*2e+6)
+
     #   Total cropping time
-    after_idx = before_idx + signal_time
-    reflected_idx = before_idx
-    vcc_reflected = CA.incid_og.y[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
-    time_reflected = CA.incid_og.x[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
+    reflected_after_idx = reflected_before_idx + signal_time
+    reflected_idx = reflected_before_idx
+    vcc_reflected = CA.incid_og.y[reflected_before_idx - CA.spacing: reflected_after_idx + CA.spacing]
+    time_reflected = CA.incid_og.x[reflected_before_idx - CA.spacing: reflected_after_idx + CA.spacing]
 
     #   For transmitted wave:
-    before_idx = incid_before_idx + int((CA.first_gage + CA.second_gage)/CA.sound_velocity*2000000)+int((CA.current_specimen.l/CA.sound_velocity*2000000))
-    #while K * CA.trans_og.y[before_idx]+ noize[before_idx] < 0:
-    #    before_idx -= 1
+    trans_threshold = 0.01 * max_trans
+    trans_before_idx_real = peaks_trans[0]
+    while K * CA.trans_og.y[trans_before_idx_real] < - trans_threshold:
+        trans_before_idx_real -= 1
+
+    # Calculate the beginning of transition wave based on 
+    # first strain gage position, second strain gage position
+    # and soun velocity, I add also length of the specimen
+    # better if it will be sound velocity of the sample, but we don't know it
+
+    trans_before_idx = incid_before_idx + int((CA.first_gage+CA.second_gage+CA.specimen_length)/CA.sound_velocity*2e+6)
+
+    # Here I add the CA.trans_shift parameter to understand how many points
+    # between transmitted signal risng and its beginning by sound velocity calculation
+    # It is important to cut the stress-strain curve
 
     #   Total cropping time
-    after_idx = before_idx + signal_time
+    trans_after_idx = trans_before_idx + signal_time
+    CA.trans_shift = trans_before_idx_real - trans_before_idx
 
     '''
             uncomment the following to display where the cropping occurs.
@@ -135,8 +148,8 @@ def auto_crop(update_logger, CA):
     plt.show()
     '''
 
-    vcc_trans = CA.trans_og.y[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
-    time_trans = CA.trans_og.x[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
+    vcc_trans = CA.trans_og.y[trans_before_idx - CA.spacing: trans_after_idx + CA.spacing]
+    time_trans = CA.trans_og.x[trans_before_idx - CA.spacing: trans_after_idx + CA.spacing]
 
     zeroing([time_incid, time_reflected, time_trans])
 

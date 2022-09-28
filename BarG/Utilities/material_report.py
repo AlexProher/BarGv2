@@ -36,7 +36,7 @@ def print_report(material):
 
     
     ind = list(max_item.corr_stress).index(max(max_item.corr_stress))
-    fig1.update_xaxes(range = [0,max_item.corr_strain[ind]+max(max_item.corr_strain)/5])
+    #fig1.update_xaxes(range = [0,max_item.corr_strain[ind]+max(max_item.corr_strain)/5])
       
     return fig1, fig2
 

@@ -114,6 +114,7 @@ class Specimen:
 
         self.temperature = None
         self.time_IR = None
+        self.eq_strain = None
 
     def __str__(self):
         return self.title
@@ -175,6 +176,7 @@ class CoreAnalyzer:
         self.raw_time_IR = None
         self.temperature = None
         self.time_IR = None
+        self.eq_strain = None
 
     def begin_analyse(self, files):
         if self.mech_exp:
