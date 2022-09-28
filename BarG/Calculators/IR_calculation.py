@@ -60,11 +60,12 @@ def IR_calculation(ca, tr_c = 0.9):
 
     if ca.current_specimen.valid:
 
-        time, temperature = ct.cut_signal(ca.true_stress_strain[0], temperature, ca.time, time)
+        time, temperature, eq_strain = ct.cut_signal(ca.true_stress_strain[0], temperature, ca.time, time)
 
 
     ca.temperature = temperature
     ca.time_IR = time
+    ca.eq_strain = eq_strain
 
     ca.update_logger('IR Calculation CMPLT')
     

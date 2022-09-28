@@ -28,6 +28,26 @@ def cut_signal(signal1, signal2, time1, time2):
     newTime2, newSignal2 = my_interpolation(time2, signal2)   
     p1, p2 = find_slope(np.array(signal1), newSignal2)
     #Сдвигаем сигнал температуры влево так чтобы время обнаруженного подъема р1 совпало со временем р1
+    newTime2 = time2 - newTime2[p2] + time1[p1]
+    #new_signal2.time = new_signal2.time - 107e-6
+    #отрезвем сигнал температуры сначала так чтобы были только положительные времена
+    zero = np.where(newTime2 >= 0)[0][0]
+    last = np.where(newTime2 >= time1[-1])[0][0]
+    newTime2 = newTime2[zero-1:last]
+    newSignal2 = signal2[zero-1:last]
+    newTime2[0] = 0
+    newSignal2[0] = 0
+    eq_strain = [signal1[np.where(time1 >= item)[0][0]] for item in newTime2]
+    
+    
+    return (newTime2, newSignal2, eq_strain)
+
+def cut_signal_old(signal1, signal2, time1, time2):
+    #Функция отрезвет сигнал температуры в соответствии с длиной сигнала деформаций
+    #сначала интерполируем второй синал чтобы его можно было двигать плавно
+    newTime2, newSignal2 = my_interpolation(time2, signal2)   
+    p1, p2 = find_slope(np.array(signal1), newSignal2)
+    #Сдвигаем сигнал температуры влево так чтобы время обнаруженного подъема р1 совпало со временем р2
     newTime2 = newTime2 - newTime2[p2] + time1[p1]
     #new_signal2.time = new_signal2.time - 107e-6
     #отрезвем сигнал температуры сначала так чтобы были только положительные времена

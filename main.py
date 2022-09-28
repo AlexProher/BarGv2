@@ -131,6 +131,7 @@ def make_analysis(way):
             specimen.strain_rate = ca.mean_strain_rate
             specimen.temperature = ca.temperature
             specimen.time_IR = ca.time_IR
+            specimen.eq_strain = ca.eq_strain
 
         
 
@@ -148,8 +149,8 @@ def make_analysis(way):
                                         'true_stress': specimen.true_stress,
                                         'F_in': specimen.F_in,
                                         'F_out': specimen.F_out,
-                                        'Energy': specimen.energy,
-                                        'Temperature': specimen.temperature
+                                        'Energy': specimen.energy
+                                        #'Temperature': specimen.temperature
                                         })
             
             way_to_result = way + "/" + 'results_' + material.title + "/" + specimen.title + "/" 

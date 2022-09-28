@@ -217,7 +217,7 @@ def temperature(specimen):
                                 y = specimen.true_stress,
                                 name = 'True Stress'),
                                 secondary_y=False)
-    fig1.add_trace(go.Scatter(x = specimen.true_strain, 
+    fig1.add_trace(go.Scatter(x = specimen.eq_strain, 
                                 y = specimen.temperature, 
                                 name = 'Temperature'),
                                 secondary_y=True)
