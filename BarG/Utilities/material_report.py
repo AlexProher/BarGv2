@@ -13,12 +13,12 @@ def print_report(material):
 
     
     fig2 = go.Figure()
-    fig2.update_layout(template = 'none', 
-                        font=dict(size=16),
+    fig2.update_layout(template = 'none', width = 1000, height = 700,  
+                        font=dict(size=20),
                         title = f'Temperatures for {material.title},',
                         )
-    fig2.update_xaxes(title = 'Time, [mks]')
-    fig2.update_yaxes(title = 'Temperature rise, [C]')
+    fig2.update_xaxes(title = 'Time, [s]', title_font = {"size": 20}, tickfont = {"size": 20})
+    fig2.update_yaxes(title = 'Temperature rise, [C]', title_font = {"size": 20}, tickfont = {"size": 20})
 
     max_str = 0
     for item in material.get_specimens():

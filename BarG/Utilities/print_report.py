@@ -209,8 +209,8 @@ def machanisc(specimen):
 def temperature(specimen):
     fig1 = make_subplots(specs=[[{"secondary_y": True}]])
 
-    fig1.update_layout(template = 'none', 
-                        font=dict(size=16),
+    fig1.update_layout(template = 'none', width = 1000, height = 700, 
+                        font=dict(size=20),
                         title = f'{specimen.material} {specimen.title}')
 
     fig1.add_trace(go.Scatter(x = specimen.true_strain, 
@@ -222,10 +222,10 @@ def temperature(specimen):
                                 name = 'Temperature'),
                                 secondary_y=True)
 
-    fig1.update_xaxes(title_text="Strain")
+    fig1.update_xaxes(title_text="Strain", title_font = {"size": 20}, tickfont = {"size": 20})
 
-    fig1.update_yaxes(title_text="Stress, [MPa]", secondary_y=False)
-    fig1.update_yaxes(title_text="Temperature rise, C", secondary_y=True)
+    fig1.update_yaxes(title_text="Stress, [MPa]", secondary_y=False, title_font = {"size": 20}, tickfont = {"size": 20})
+    fig1.update_yaxes(title_text="Temperature rise, C", secondary_y=True, title_font = {"size": 20}, tickfont = {"size": 20})
     return fig1
 
 
