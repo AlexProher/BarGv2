@@ -138,6 +138,7 @@ def final_calculation(update_logger, CA):
     try:
         CA.mean_strain_rate = SignalProcessing.mean_of_signal(update_logger, eng_strain_rate[:-1], CA.prominence_percent, CA.mode,
                                                             CA.spacing)
+        
     except Exception as e:
         update_logger(str(e))
 

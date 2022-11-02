@@ -115,11 +115,24 @@ def auto_crop(update_logger, CA):
     time_reflected = CA.incid_og.x[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
 
     #   For transmitted wave:
-    before_idx = peaks_trans[0]
-    while K * CA.trans_og.y[before_idx]+ noize[before_idx] < 0:
-        before_idx -= 1
+    trans_threshold = 0.01 * max_trans
+    trans_before_idx_real = peaks_trans[0]
+    while K * CA.trans_og.y[trans_before_idx_real] < - trans_threshold:
+        trans_before_idx_real -= 1
+
+    # Calculate the beginning of transition wave based on 
+    # first strain gage position, second strain gage position
+    # and soun velocity, I add also length of the specimen
+    # better if it will be sound velocity of the sample, but we don't know it
+
+    trans_before_idx = incid_before_idx + int((CA.first_gage+CA.second_gage+CA.specimen_length)/CA.sound_velocity*2e+6)
+
+    # Here I add the CA.trans_shift parameter to understand how many points
+    # between transmitted signal risng and its beginning by sound velocity calculation
+    # It is important to cut the stress-strain curve
 
     #   Total cropping time
+    trans_after_idx = trans_before_idx + signal_time
     after_idx = before_idx + signal_time
 
     '''
@@ -135,8 +148,8 @@ def auto_crop(update_logger, CA):
     plt.show()
     '''
 
-    vcc_trans = CA.trans_og.y[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
-    time_trans = CA.trans_og.x[before_idx - CA.spacing: after_idx + 1 * CA.spacing]
+    vcc_trans = CA.trans_og.y[trans_before_idx - CA.spacing: trans_after_idx + CA.spacing]
+    time_trans = CA.trans_og.x[trans_before_idx - CA.spacing: trans_after_idx + CA.spacing]
 
     zeroing([time_incid, time_reflected, time_trans])
 
@@ -172,7 +185,7 @@ def mean_of_signal(update_logger, signal, prominence_percent, mode, spacing):
         k = -1
 
     #   Find the first peak of the signal, with a prominence of half the peak's value:
-    peaks, _ = find_peaks(smooth_signal, prominence = peak_value * prominence_percent)
+    peaks, _ = find_peaks(smooth_signal, prominence = peak_value * prominence_percent/100)
     if len(peaks) == 0:
         return -1
     peak = peaks[0]

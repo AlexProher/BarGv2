@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
 from scipy import interpolate
-import biosig as bs
+#import biosig as bs
 import os
 
 def open_files(path):

@@ -184,8 +184,9 @@ class CoreAnalyzer:
                 signal1 = rd.read_flt(self.path_folder +data_FLT[0])
                 signal2 = rd.read_flt(self.path_folder +data_FLT[1])
             elif data_WFT:
-                hdr, signal1 = rd.read_wft(self.path_folder +data_WFT[0])
-                hdr, signal2 = rd.read_wft(self.path_folder +data_WFT[1])
+                #hdr, signal1 = rd.read_wft(self.path_folder +data_WFT[0])
+                #hdr, signal2 = rd.read_wft(self.path_folder +data_WFT[1])
+                signal1, signal2 = rd.read_wft(self.path_folder)
             else:
                 self.update_logger('No mech data to analyse')
                 self.mech_exp = False
